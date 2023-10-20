@@ -6,10 +6,37 @@ import LinkBtn from "../shared/LinkBtn";
 
 export default function Access() {
   const [loginOrRegister, setLoginOrRegister] = useState(true); // true = signUp, false = sign in.
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState([]);
+
+  function validate(toValidate) {
+    const regex = {
+      email: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
+      password: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/, // requirements - one number, lowercase and uppercase letter and at least 8 characters long.
+    };
+
+    const toTest = toValidate === "email" ? email : password;
+
+    if (regex[toValidate].test(toTest) && errors.includes(toValidate)) {
+      setErrors((prev) => prev.filter((error) => error !== toValidate));
+      return;
+    }
+
+    if (!regex[toValidate].test(toTest) && !errors.includes(toValidate)) {
+      setErrors((prev) => [...prev, toValidate]);
+    }
+  }
 
   function handleSubmit(ev) {
     ev.preventDefault();
-    console.log(ev);
+
+    validate("email");
+    validate("password");
+
+    if (errors.length === 0) {
+      console.log({ email, password });
+    }
   }
 
   return (
@@ -47,12 +74,19 @@ export default function Access() {
             <span className="w-full h-[1px] bg-charcoal-gray-500"></span>
           </div>
           <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
-            <Email />
-            <Password />
-            <SubmitBtn
-              click={() => setLoginOrRegister(!loginOrRegister)}
-              text={loginOrRegister ? "Sign Up Now" : "Sign In Now"}
+            <Email
+              errors={errors}
+              validate={validate}
+              email={email}
+              setEmail={setEmail}
             />
+            <Password
+              errors={errors}
+              validate={validate}
+              password={password}
+              setPassword={setPassword}
+            />
+            <SubmitBtn text={loginOrRegister ? "Sign Up Now" : "Sign In Now"} />
             <p className="text-center text-sm text-charcoal-gray-300">
               {loginOrRegister ? "Have an account? " : "Don't have an account?"}
               <span

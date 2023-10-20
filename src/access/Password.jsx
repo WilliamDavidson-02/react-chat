@@ -1,6 +1,7 @@
 import { useState } from "react";
 
-export default function Password() {
+export default function Password(props) {
+  const { password, setPassword, errors, validate } = props;
   const [showPassword, setShowPassword] = useState(false);
 
   return (
@@ -10,7 +11,14 @@ export default function Password() {
       </label>
       <div className="w-full relative max-h-[42px]">
         <input
-          className="w-full bg-charcoal-gray-700 border border-charcoal-gray-500 px-4 py-2 rounded-lg"
+          onChange={(ev) => setPassword(ev.target.value)}
+          value={password}
+          onBlur={() => validate("password")}
+          className={`w-full bg-charcoal-gray-700 border ${
+            errors.includes("password")
+              ? "border-red-600 focus:border-red-400"
+              : "border-charcoal-gray-500 focus:border-charcoal-gray-300"
+          } px-4 py-2 rounded-lg`}
           type={showPassword ? "text" : "password"}
           id="password"
           placeholder="••••••••"
