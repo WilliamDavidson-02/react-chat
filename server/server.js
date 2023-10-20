@@ -9,7 +9,14 @@ const supabase = createClient(
   process.env.SUPABASE_KEY
 );
 
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://react-chat-two-orcin.vercel.app",
+    ],
+  })
+);
 app.use(express.json());
 
 app.post("/server/register", (req, res) => {
