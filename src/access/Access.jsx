@@ -3,9 +3,10 @@ import SubmitBtn from "../shared/SubmitBtn";
 import Password from "./Password";
 import Email from "./Email";
 import LinkBtn from "../shared/LinkBtn";
+import axios from "../axiosConfig";
 
 export default function Access() {
-  const [loginOrRegister, setLoginOrRegister] = useState(true); // true = signUp, false = sign in.
+  const [loginOrRegister, setLoginOrRegister] = useState("register");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState([]);
@@ -35,7 +36,7 @@ export default function Access() {
     validate("password");
 
     if (errors.length === 0) {
-      console.log({ email, password });
+      axios.post(`/${loginOrRegister}`, { email, password });
     }
   }
 
@@ -44,10 +45,10 @@ export default function Access() {
       <div className="w-full max-w-[500px] h-full flex flex-col items-center justify-center">
         <div className="w-full mb-10">
           <h1 className="mt-8 mb-2 text-2xl lg:text-3xl">
-            {loginOrRegister ? "Get started" : "Welcome back"}
+            {loginOrRegister === "register" ? "Get started" : "Welcome back"}
           </h1>
           <p className="text-sm text-charcoal-gray-300">
-            {loginOrRegister
+            {loginOrRegister === "register"
               ? "Create a new account"
               : "Sign in to your account"}
           </p>
@@ -86,14 +87,26 @@ export default function Access() {
               password={password}
               setPassword={setPassword}
             />
-            <SubmitBtn text={loginOrRegister ? "Sign Up Now" : "Sign In Now"} />
+            <SubmitBtn
+              text={
+                loginOrRegister === "register" ? "Sign Up Now" : "Sign In Now"
+              }
+            />
             <p className="text-center text-sm text-charcoal-gray-300">
-              {loginOrRegister ? "Have an account? " : "Don't have an account?"}
+              {loginOrRegister === "register"
+                ? "Have an account? "
+                : "Don't have an account?"}
               <span
                 className="text-light-silver underline cursor-pointer"
-                onClick={() => setLoginOrRegister(!loginOrRegister)}
+                onClick={() =>
+                  setLoginOrRegister(
+                    loginOrRegister === "login" ? "register" : "login"
+                  )
+                }
               >
-                {loginOrRegister ? "Sign In Now" : " Sign Up Now"}
+                {loginOrRegister === "register"
+                  ? "Sign In Now"
+                  : " Sign Up Now"}
               </span>
             </p>
           </form>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 export default function Email(props) {
   const { email, setEmail, errors, validate } = props;
@@ -17,7 +17,7 @@ export default function Email(props) {
           errors.includes("email")
             ? "border-red-600 focus:border-red-400"
             : "border-charcoal-gray-500 focus:border-charcoal-gray-300"
-        } px-4 py-2 rounded-lg`}
+        } px-4 py-2 rounded-lg placeholder:text-charcoal-gray-500`}
         type="text"
         id="email"
         placeholder="you@example.com"

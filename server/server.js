@@ -1,9 +1,24 @@
 require("dotenv").config();
 const express = require("express");
+const { createClient } = require("@supabase/supabase-js");
+const cors = require("cors");
 const app = express();
 
-app.get("/server/test", (req, res) => {
-  res.json({ body: "test" + Date.now() });
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
+
+app.use(cors());
+app.use(express.json());
+
+app.post("/server/register", (req, res) => {
+  const { email, password } = req.body;
+});
+
+app.post("/server/login", (req, res) => {
+  const { email, password } = req.body;
+  console.log(email, password);
 });
 
 if (process.env.APP_PORT) app.listen(process.env.APP_PORT);
