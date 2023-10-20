@@ -5,6 +5,11 @@
 * {
   box-sizing: border-box;
 }
+
+body {
+  background: #1a1a1a;
+}
+
 button {
   outline: none;
   cursor: pointer;

@@ -11,7 +11,7 @@ export default function Access() {
   }
 
   return (
-    <div className="w-screen h-screen bg-charcoal-gray-900 flex justify-center text-light-silver px-4">
+    <div className="w-screen h-screen flex justify-center text-light-silver px-4">
       <div className="w-full max-w-[500px] h-full flex flex-col items-center justify-center">
         <div className="w-full mb-10">
           <h1 className="mt-8 mb-2 text-2xl lg:text-3xl">

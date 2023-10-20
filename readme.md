@@ -1,3 +1,3 @@
-### 👷🏼‍♂️ React chat
+# React chat
 
-Small chat project.
+Small react chat project.
