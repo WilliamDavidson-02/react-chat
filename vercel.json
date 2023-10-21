@@ -1,6 +1,4 @@
 {
-  "buildCommand": "cd server && npm install && cd .. && npm install && ./node_modules/vite/bin/vite.js build",
-  "outputDirectory": "/dist",
   "rewrites": [
     {
       "source": "/(.*)",
@@ -8,7 +6,11 @@
     },
     {
       "source": "/server/(.*)",
-      "destination": "/server/server.js"
+      "destination": "/server/server.js",
+      "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+      "headers": {
+        "Access-Control-Allow-Origin": "*"
+      }
     }
   ]
 }
