@@ -1,4 +1,13 @@
 {
+  "routes": [
+    {
+      "source": "/server/(.*)",
+      "destination": "/server/server.js",
+      "headers": {
+        "Access-Control-Allow-Origin": "*"
+      }
+    }
+  ],
   "rewrites": [
     {
       "source": "/(.*)",
@@ -6,10 +15,7 @@
     },
     {
       "source": "/server/(.*)",
-      "destination": "/server/server.js",
-      "headers": {
-        "Access-Control-Allow-Origin": "*"
-      }
+      "destination": "/server/server.js"
     }
   ]
 }
