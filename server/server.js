@@ -14,11 +14,12 @@ app.use(express.json());
 
 app.post("/server/register", (req, res) => {
   const { email, password } = req.body;
+  res.status(200).json({ message: "test" });
 });
 
 app.post("/server/login", (req, res) => {
   const { email, password } = req.body;
-  console.log(email, password);
+  res.status(200).json({ message: "test" });
 });
 
 if (process.env.APP_PORT) app.listen(process.env.APP_PORT);
