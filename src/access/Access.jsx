@@ -4,12 +4,15 @@ import Password from "./Password";
 import Email from "./Email";
 import LinkBtn from "../shared/LinkBtn";
 import axios from "../axiosConfig";
+import { useNavigate } from "react-router-dom";
 
 export default function Access() {
   const [loginOrRegister, setLoginOrRegister] = useState("register");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState([]);
+
+  const navigate = useNavigate();
 
   function validate(toValidate) {
     const regex = {
@@ -36,7 +39,13 @@ export default function Access() {
     validate("password");
 
     if (errors.length === 0) {
-      axios.post(`/${loginOrRegister}`, { email, password });
+      axios
+        .post(`/${loginOrRegister}`, { email, password })
+        .then((response) => {
+          document.cookie = `token=${response.data.token}`;
+          navigate("/chat");
+        })
+        .catch((error) => console.log(error));
     }
   }
 
