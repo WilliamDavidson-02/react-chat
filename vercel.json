@@ -1,4 +1,6 @@
 {
+  "buildCommand": "npm install && ./node_modules/vite/bin/vite.js build",
+  "outputDirectory": "/dist",
   "rewrites": [
     {
       "source": "/(.*)",
@@ -6,7 +8,7 @@
     },
     {
       "source": "/server/(.*)",
-      "destination": "/server"
+      "destination": "/server/index.js"
     }
   ]
 }
