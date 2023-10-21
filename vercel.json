@@ -8,7 +8,7 @@
     },
     {
       "source": "/server/(.*)",
-      "destination": "/server/index.js"
+      "destination": "/server/server.js"
     }
   ]
 }
