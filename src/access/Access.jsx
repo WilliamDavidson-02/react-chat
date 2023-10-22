@@ -5,11 +5,14 @@ import Email from "./Email";
 import LinkBtn from "../shared/LinkBtn";
 import axios from "../axiosConfig";
 import { useNavigate } from "react-router-dom";
+import Name from "./Name";
 
 export default function Access() {
   const [loginOrRegister, setLoginOrRegister] = useState("register");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [errors, setErrors] = useState([]);
 
   const navigate = useNavigate();
@@ -20,15 +23,40 @@ export default function Access() {
       password: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/, // requirements - one number, lowercase and uppercase letter and at least 8 characters long.
     };
 
-    const toTest = toValidate === "email" ? email : password;
+    let toTest;
 
-    if (regex[toValidate].test(toTest) && errors.includes(toValidate)) {
-      setErrors((prev) => prev.filter((error) => error !== toValidate));
-      return;
+    switch (toValidate) {
+      case "email":
+        toTest = email;
+        break;
+      case "password":
+        toTest = password;
+        break;
+      case "First name":
+        toTest = firstName;
+        break;
+      default:
+        toTest = lastName;
     }
 
-    if (!regex[toValidate].test(toTest) && !errors.includes(toValidate)) {
-      setErrors((prev) => [...prev, toValidate]);
+    if (regex[toValidate]) {
+      if (regex[toValidate].test(toTest) && errors.includes(toValidate)) {
+        setErrors((prev) => prev.filter((error) => error !== toValidate));
+        return;
+      }
+
+      if (!regex[toValidate].test(toTest) && !errors.includes(toValidate)) {
+        setErrors((prev) => [...prev, toValidate]);
+      }
+    } else {
+      if (toTest.length >= 2 && errors.includes(toValidate)) {
+        setErrors((prev) => prev.filter((error) => error !== toValidate));
+        return;
+      }
+
+      if (toTest.length < 2 && !errors.includes(toValidate)) {
+        setErrors((prev) => [...prev, toValidate]);
+      }
     }
   }
 
@@ -37,10 +65,22 @@ export default function Access() {
 
     validate("email");
     validate("password");
+    if (loginOrRegister === "register") {
+      validate("First name");
+      validate("Last name");
+    }
 
     if (errors.length === 0) {
+      let dataToSend = { email: email.trim(), password: password.trim() };
+      if (loginOrRegister === "register")
+        dataToSend = {
+          ...dataToSend,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+        };
+
       axios
-        .post(`/${loginOrRegister}`, { email, password })
+        .post(`/${loginOrRegister}`, dataToSend)
         .then((response) => {
           document.cookie = `token=${response.data.token}`;
           navigate("/chat");
@@ -84,6 +124,24 @@ export default function Access() {
             <span className="w-full h-[1px] bg-charcoal-gray-500"></span>
           </div>
           <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+            {loginOrRegister === "register" && (
+              <>
+                <Name
+                  errors={errors}
+                  validate={validate}
+                  name={firstName}
+                  setName={setFirstName}
+                  label={"First name"}
+                />
+                <Name
+                  errors={errors}
+                  validate={validate}
+                  name={lastName}
+                  setName={setLastName}
+                  label={"Last name"}
+                />
+              </>
+            )}
             <Email
               errors={errors}
               validate={validate}

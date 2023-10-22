@@ -17,11 +17,19 @@ app.use(cors());
 app.use(express.json());
 
 app.post("/api/register", async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, firstName, lastName } = req.body;
   const hasedPass = bcrypt.hashSync(password, salt);
 
   try {
-    await supabase.from("users").insert({ email, password: hasedPass });
+    const { error } = await supabase.from("users").insert({
+      email,
+      password: hasedPass,
+      first_name: firstName,
+      last_name: lastName,
+    });
+
+    if (error)
+      res.status(500).json({ message: "Error while creating your account" });
 
     const token = jwt.sign(email, process.env.JWT_SECRET_KEY);
     res.status(200).json({ token });
