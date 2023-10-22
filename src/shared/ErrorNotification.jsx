@@ -1,0 +1,46 @@
+import React, { useEffect } from "react";
+import { motion } from "framer-motion";
+
+export default function ErrorNotification(props) {
+  const { message, index, setErrorNotifications } = props;
+
+  let removeNotification;
+
+  useEffect(() => {
+    removeNotification = setTimeout(() => {
+      setErrorNotifications((prev) => prev.filter((_, idx) => idx !== index));
+    }, 5000);
+  }, []);
+
+  function removeNotificationCard() {
+    setErrorNotifications((prev) => prev.filter((_, idx) => idx !== index));
+    clearTimeout(removeNotification);
+  }
+
+  return (
+    <motion.div
+      onClick={removeNotificationCard}
+      initial={{
+        opacity: 0,
+        x: "500px",
+      }}
+      animate={{
+        opacity: 1,
+        x: 0,
+        transition: {
+          type: "spring",
+          mass: 0.5,
+          damping: 8,
+        },
+      }}
+      exit={{
+        opacity: 0,
+        x: "500px",
+      }}
+      whileTap={{ scale: 0.9 }}
+      className="w-full p-2 bg-charcoal-gray-700 border border-red-600 text-red-600 rounded-lg cursor-pointer"
+    >
+      {message}
+    </motion.div>
+  );
+}

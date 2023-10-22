@@ -20,6 +20,16 @@ app.post("/api/register", async (req, res) => {
   const { email, password, firstName, lastName } = req.body;
   const hasedPass = bcrypt.hashSync(password, salt);
 
+  const { data } = await supabase
+    .from("users")
+    .select("email")
+    .eq("email", email);
+
+  if (data)
+    return res.status(409).json({
+      message: `Email already exists, sign in with ${email} or try another email.`,
+    });
+
   try {
     const { error } = await supabase.from("users").insert({
       email,

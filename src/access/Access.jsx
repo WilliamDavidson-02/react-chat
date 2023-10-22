@@ -6,6 +6,8 @@ import LinkBtn from "../shared/LinkBtn";
 import axios from "../axiosConfig";
 import { useNavigate } from "react-router-dom";
 import Name from "./Name";
+import ErrorNotification from "../shared/ErrorNotification";
+import { AnimatePresence } from "framer-motion";
 
 export default function Access() {
   const [loginOrRegister, setLoginOrRegister] = useState("register");
@@ -14,8 +16,20 @@ export default function Access() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [errors, setErrors] = useState([]);
+  const [errorNotifications, setErrorNotifications] = useState([]);
 
   const navigate = useNavigate();
+
+  function validateFilter(test, toValidate) {
+    if (test && errors.includes(toValidate)) {
+      setErrors((prev) => prev.filter((error) => error !== toValidate));
+      return;
+    }
+
+    if (!test && !errors.includes(toValidate)) {
+      setErrors((prev) => [...prev, toValidate]);
+    }
+  }
 
   function validate(toValidate) {
     const regex = {
@@ -39,25 +53,14 @@ export default function Access() {
         toTest = lastName;
     }
 
-    if (regex[toValidate]) {
-      if (regex[toValidate].test(toTest) && errors.includes(toValidate)) {
-        setErrors((prev) => prev.filter((error) => error !== toValidate));
-        return;
-      }
+    const comparisons = regex[toValidate]
+      ? regex[toValidate].test(toTest)
+      : toTest.length >= 2;
+    validateFilter(comparisons, toValidate);
+  }
 
-      if (!regex[toValidate].test(toTest) && !errors.includes(toValidate)) {
-        setErrors((prev) => [...prev, toValidate]);
-      }
-    } else {
-      if (toTest.length >= 2 && errors.includes(toValidate)) {
-        setErrors((prev) => prev.filter((error) => error !== toValidate));
-        return;
-      }
-
-      if (toTest.length < 2 && !errors.includes(toValidate)) {
-        setErrors((prev) => [...prev, toValidate]);
-      }
-    }
+  function capitalizeFirstLetter(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
   function handleSubmit(ev) {
@@ -71,12 +74,15 @@ export default function Access() {
     }
 
     if (errors.length === 0) {
-      let dataToSend = { email: email.trim(), password: password.trim() };
+      let dataToSend = {
+        email: email.trim().toLocaleLowerCase(),
+        password: password.trim(),
+      };
       if (loginOrRegister === "register")
         dataToSend = {
           ...dataToSend,
-          firstName: firstName.trim(),
-          lastName: lastName.trim(),
+          firstName: capitalizeFirstLetter(firstName).trim(),
+          lastName: capitalizeFirstLetter(lastName).trim(),
         };
 
       axios
@@ -85,12 +91,32 @@ export default function Access() {
           document.cookie = `token=${response.data.token}`;
           navigate("/chat");
         })
-        .catch((error) => console.log(error));
+        .catch((error) => {
+          const { data, status } = error.response;
+          if (status === 409) setErrors(["email"]);
+          setErrorNotifications((prev) => [...prev, data.message]);
+        });
     }
   }
 
   return (
-    <div className="w-screen h-screen flex justify-center text-light-silver px-4">
+    <div className="relative w-screen max-w-screen overflow-hidden h-screen flex justify-center text-light-silver px-4">
+      <AnimatePresence>
+        {errorNotifications.length > 0 && (
+          <div className="absolute top-5 right-5 w-full max-w-[500px] flex flex-col gap-4">
+            {errorNotifications.map((message, index) => {
+              return (
+                <ErrorNotification
+                  message={message}
+                  key={index}
+                  index={index}
+                  setErrorNotifications={setErrorNotifications}
+                />
+              );
+            })}
+          </div>
+        )}
+      </AnimatePresence>
       <div className="w-full max-w-[500px] h-full flex flex-col items-center justify-center">
         <div className="w-full mb-10">
           <h1 className="mt-8 mb-2 text-2xl lg:text-3xl">
