@@ -3,6 +3,7 @@ const express = require("express");
 const { createClient } = require("@supabase/supabase-js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const app = express();
 
@@ -13,8 +14,33 @@ const supabase = createClient(
   process.env.SUPABASE_KEY
 );
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 app.use(express.json());
+app.use(cookieParser());
+
+app.get("/api/user", async (req, res) => {
+  const { token } = req.cookies;
+
+  try {
+    const email = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const { data } = await supabase
+      .from("users")
+      .select("first_name, last_name")
+      .eq("email", email);
+
+    if (!data) return res.status(404).json({ message: "User not found" });
+    const { first_name, last_name } = data[0];
+    res.status(200).json({ email, firstName: first_name, lastName: last_name });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error while getting your information" });
+  }
+});
 
 app.post("/api/register", async (req, res) => {
   const { email, password, firstName, lastName } = req.body;

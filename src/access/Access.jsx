@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SubmitBtn from "../shared/SubmitBtn";
 import Password from "./Password";
 import Email from "./Email";
@@ -19,6 +19,10 @@ export default function Access() {
   const [errorNotifications, setErrorNotifications] = useState([]);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (document.cookie.includes("token=")) navigate("/chat");
+  }, []);
 
   function validateFilter(test, toValidate) {
     if (test && errors.includes(toValidate)) {
