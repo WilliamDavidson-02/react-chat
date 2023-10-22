@@ -1,7 +1,11 @@
 {
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/",
+      "destination": "/"
+    },
+    {
+      "source": "/chat",
       "destination": "/"
     },
     {
