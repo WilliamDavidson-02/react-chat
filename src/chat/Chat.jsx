@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../axiosConfig";
+import Cookies from "js-cookie";
 
 export default function Chat() {
   const [user, setUser] = useState({
@@ -12,12 +13,14 @@ export default function Chat() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!document.cookie.includes("token=")) navigate("/");
-
-    axios.get("/user").then((response) => {
-      const { firstName, lastName, email } = response.data;
-      setUser({ firstName, lastName, email });
-    });
+    if (!Cookies.get("token")) {
+      navigate("/");
+    } else {
+      axios.get("/user").then((response) => {
+        const { firstName, lastName, email } = response.data;
+        setUser({ firstName, lastName, email });
+      });
+    }
   }, []);
 
   return (

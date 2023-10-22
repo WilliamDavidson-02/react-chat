@@ -33,12 +33,15 @@ app.get("/api/user", async (req, res) => {
       .select("first_name, last_name")
       .eq("email", email);
 
-    if (!data) return res.status(404).json({ message: "User not found" });
+    if (data.length === 0)
+      return res.status(404).json({ message: "User not found" });
     const { first_name, last_name } = data[0];
     res.status(200).json({ email, firstName: first_name, lastName: last_name });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Error while getting your information" });
+    res
+      .status(500)
+      .json({ message: "Error while retrieving your information" });
   }
 });
 
@@ -74,9 +77,29 @@ app.post("/api/register", async (req, res) => {
   }
 });
 
-app.post("/api/login", (req, res) => {
+app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
-  res.status(200).json({ message: "test" });
+
+  try {
+    const { data } = await supabase
+      .from("users")
+      .select("password")
+      .eq("email", email);
+
+    const passOk = bcrypt.compareSync(password, data[0].password);
+
+    if (data.length === 0 || !passOk)
+      return res.status(404).json({ message: "User not found" });
+
+    const token = jwt.sign(email, process.env.JWT_SECRET_KEY);
+
+    res.status(200).json({ token });
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ message: "Error while retrieving your information" });
+  }
 });
 
 if (process.env.APP_PORT) app.listen(process.env.APP_PORT);

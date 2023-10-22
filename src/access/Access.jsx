@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import Name from "./Name";
 import ErrorNotification from "../shared/ErrorNotification";
 import { AnimatePresence } from "framer-motion";
+import Cookies from "js-cookie";
 
 export default function Access() {
   const [loginOrRegister, setLoginOrRegister] = useState("register");
@@ -21,7 +22,8 @@ export default function Access() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (document.cookie.includes("token=")) navigate("/chat");
+    if (Cookies.get("token")) navigate("/chat");
+    if (Cookies.get("isRegistered") === "yes") setLoginOrRegister("login");
   }, []);
 
   function validateFilter(test, toValidate) {
@@ -92,7 +94,13 @@ export default function Access() {
       axios
         .post(`/${loginOrRegister}`, dataToSend)
         .then((response) => {
-          document.cookie = `token=${response.data.token}`;
+          Cookies.set("token", `${response.data.token}`, { expires: 1 }); // expires in 1 day.
+          if (
+            loginOrRegister === "register" &&
+            !Cookies.get("isRegister") === "yes"
+          ) {
+            Cookies.set("isRegistered", "yse");
+          }
           navigate("/chat");
         })
         .catch((error) => {
