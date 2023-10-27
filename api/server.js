@@ -30,13 +30,18 @@ app.get("/api/user", async (req, res) => {
     const email = jwt.verify(token, process.env.JWT_SECRET_KEY);
     const { data } = await supabase
       .from("users")
-      .select("first_name, last_name")
+      .select("first_name, last_name, profile_image")
       .eq("email", email);
 
     if (data.length === 0)
       return res.status(404).json({ message: "User not found" });
-    const { first_name, last_name } = data[0];
-    res.status(200).json({ email, firstName: first_name, lastName: last_name });
+    const { first_name, last_name, profile_image } = data[0];
+    res.status(200).json({
+      email,
+      firstName: first_name,
+      lastName: last_name,
+      profileImage: profile_image,
+    });
   } catch (error) {
     console.log(error);
     res
@@ -46,7 +51,7 @@ app.get("/api/user", async (req, res) => {
 });
 
 app.post("/api/register", async (req, res) => {
-  const { email, password, firstName, lastName } = req.body;
+  const { email, password, firstName, lastName, colorIndex } = req.body;
   const hasedPass = bcrypt.hashSync(password, salt);
 
   const { data } = await supabase
@@ -65,6 +70,7 @@ app.post("/api/register", async (req, res) => {
       password: hasedPass,
       first_name: firstName,
       last_name: lastName,
+      profile_image: colorIndex,
     });
 
     if (error)

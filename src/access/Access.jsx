@@ -9,6 +9,8 @@ import Name from "./Name";
 import ErrorNotification from "../shared/ErrorNotification";
 import { AnimatePresence } from "framer-motion";
 import Cookies from "js-cookie";
+import { colorPallet } from "../shared/colorPallet";
+import { Github } from "lucide-react";
 
 export default function Access() {
   const [loginOrRegister, setLoginOrRegister] = useState("register");
@@ -89,6 +91,7 @@ export default function Access() {
           ...dataToSend,
           firstName: capitalizeFirstLetter(firstName).trim(),
           lastName: capitalizeFirstLetter(lastName).trim(),
+          colorIndex: Math.floor(Math.random() * colorPallet.length),
         };
 
       axios
@@ -129,7 +132,7 @@ export default function Access() {
           </div>
         )}
       </AnimatePresence>
-      <div className="w-full max-w-[500px] h-full flex flex-col items-center justify-center">
+      <div className="w-full max-w-[500px] h-full flex flex-col items-center justify-center mx-auto">
         <div className="w-full mb-10">
           <h1 className="mt-8 mb-2 text-2xl lg:text-3xl">
             {loginOrRegister === "register" ? "Get started" : "Welcome back"}
@@ -142,18 +145,7 @@ export default function Access() {
         </div>
         <div className="w-full flex flex-col gap-5">
           <LinkBtn direction={"#"}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
-            </svg>
+            <Github />
             <span>Continue with github</span>
           </LinkBtn>
           <div className="w-full flex items-center gap-4">
