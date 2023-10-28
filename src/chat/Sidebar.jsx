@@ -4,6 +4,7 @@ import { ChevronsLeft, MenuIcon } from "lucide-react";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import UserMenu from "./UserMenu";
 import { AnimatePresence } from "framer-motion";
+import SearchBar from "./SearchBar";
 
 export default function Sidebar({ user }) {
   const isMobile = useMediaQuery("(max-width: 768px");
@@ -106,6 +107,7 @@ export default function Sidebar({ user }) {
               />
             )}
           </AnimatePresence>
+          <SearchBar />
         </div>
       </div>
       <div
