@@ -69,11 +69,11 @@ export default function Sidebar({ user }) {
     <>
       <div
         ref={sidebarRef}
-        className={`group w-60 h-full flex flex-col bg-charcoal-gray-800 p-4 relative overflow-hidden
-        ${isCollapsed ? "w-0 p-0" : ''}
-        ${isResetting ? "transition-all ease-in-out duration-300" : ''}
-    `}
+        className={`group w-60 h-full flex flex-col bg-charcoal-gray-800 relative overflow-hidden
+        ${isCollapsed ? "w-0" : ''}
+        ${isResetting ? "transition-all ease-in-out duration-300" : ''}`}
       >
+        <div className="p-4">
         <div
           onMouseDown={handleMouseDown}
           onClick={resetWidth}
@@ -81,12 +81,12 @@ export default function Sidebar({ user }) {
         />
         <div
           className={`flex justify-end text-charcoal-gray-300 opacity-0 group-hover:opacity-100 transition
-            ${isMobile ? "opacity-100" : ''}
-        `}
+            ${isMobile ? "opacity-100" : ''}`}
         >
           <ChevronsLeft onClick={collapse} role="button" />
         </div>
         <Profile user={user} />
+        </div>
       </div>
       <div
         ref={navbarRef}
