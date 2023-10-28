@@ -92,10 +92,15 @@ app.post("/api/login", async (req, res) => {
       .select("password")
       .eq("email", email);
 
+    if (data.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     const passOk = bcrypt.compareSync(password, data[0].password);
 
-    if (data.length === 0 || !passOk)
+    if (!passOk) {
       return res.status(404).json({ message: "User not found" });
+    }
 
     const token = jwt.sign(email, process.env.JWT_SECRET_KEY);
 
