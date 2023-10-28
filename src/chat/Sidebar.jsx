@@ -70,8 +70,8 @@ export default function Sidebar({ user }) {
       <div
         ref={sidebarRef}
         className={`group w-60 h-full flex flex-col bg-charcoal-gray-800 p-4 relative overflow-hidden
-        ${isCollapsed && "w-0 p-0"}
-        ${isResetting && "transition-all ease-in-out duration-300"}
+        ${isCollapsed ? "w-0 p-0" : ''}
+        ${isResetting ? "transition-all ease-in-out duration-300" : ''}
     `}
       >
         <div
@@ -81,7 +81,7 @@ export default function Sidebar({ user }) {
         />
         <div
           className={`flex justify-end text-charcoal-gray-300 opacity-0 group-hover:opacity-100 transition
-            ${isMobile && "opacity-100"}
+            ${isMobile ? "opacity-100" : ''}
         `}
         >
           <ChevronsLeft onClick={collapse} role="button" />
@@ -91,8 +91,8 @@ export default function Sidebar({ user }) {
       <div
         ref={navbarRef}
         className={`absolute top-0 left-60 w-[calc(100%-240px)]
-        ${isMobile && "left-0 w-full"}
-        ${isResetting && "transition-all ease-in-out duration-300"} 
+        ${isMobile ? "left-0 w-full" : ''}
+        ${isResetting ? "transition-all ease-in-out duration-300" : ''} 
     `}
       >
         <nav className="px-3 py-2 w-full">
