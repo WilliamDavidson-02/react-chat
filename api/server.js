@@ -113,6 +113,27 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
+app.get("/api/search/:user", async (req, res) => {
+  const { user = "" } = req.params;
+  const [firstName = user, lastName = user] = user.split(" ");
+
+  try {
+    const { data, error } = await supabase
+      .from("users")
+      .select("first_name, last_name, profile_image")
+      .or(
+        `first_name.ilike.%${firstName}%, last_name.ilike.%${lastName}%, email.ilike.%${user}%` // Matches any of the conditions
+      );
+
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ message: "Error while retrieving your information" });
+  }
+});
+
 if (process.env.APP_PORT) app.listen(process.env.APP_PORT);
 
 module.exports = app;
