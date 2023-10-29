@@ -8,7 +8,6 @@ import SubmitBtn from "../shared/SubmitBtn";
 export default function Chat() {
   const [textareaValue, setTextareaValue] = useState("");
   const textareaRef = useRef(null);
-  const [numOfRows, setNumOfRows] = useState(1);
   const [user, setUser] = useState({
     firstName: "",
     lastName: "",
@@ -29,6 +28,14 @@ export default function Chat() {
     }
   }, []);
 
+  useEffect(() => {
+    if (!textareaRef.current) return;
+    textareaRef.current.style.height = "0px"; // reset the height to get the correct scrollHeight
+    const scrollHeight = textareaRef.current.scrollHeight;
+
+    textareaRef.current.style.height = `${scrollHeight}px`;
+  }, [textareaValue, textareaRef]);
+
   function handleSubmit(ev) {
     ev.preventDefault();
     console.log(textareaValue.split("\n"));
@@ -38,18 +45,9 @@ export default function Chat() {
     if (ev.shiftKey && ev.key === "Enter") {
       ev.preventDefault();
       setTextareaValue(textareaValue + "\n"); // add a new line
-
-      setNumOfRows(numOfRows + 1);
     } else if (ev.key === "Enter") {
       ev.preventDefault();
       handleSubmit(ev);
-    } else if (ev.key === "Backspace") {
-      if (numOfRows === 1) return;
-      const splitValue = textareaValue.split("\n");
-
-      if (splitValue[splitValue.length - 1] === "") {
-        setNumOfRows(numOfRows - 1);
-      }
     }
   }
 
@@ -67,10 +65,12 @@ export default function Chat() {
             onChange={(ev) => setTextareaValue(ev.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type a message"
-            rows={numOfRows}
+            rows={1}
             tabIndex={10}
             className={`flex-grow px-4 py-4 outline-none rounded-lg resize-none bg-charcoal-gray-900 border border-charcoal-gray-600 focus:border-charcoal-gray-400 transition duration-300 max-h-[500px] ${
-              numOfRows > 10 ? "overflow-y-scroll" : "overflow-y-hidden"
+              textareaRef.current?.scrollHeight >= 500
+                ? "overflow-y-scroll"
+                : "overflow-y-hidden"
             }`}
           />
           <div className="max-h-20 h-full">
