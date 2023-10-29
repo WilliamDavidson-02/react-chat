@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import Profile from "./Profile";
-import { ChevronsLeft, MenuIcon } from "lucide-react";
+import { ChevronsLeft, MenuIcon, PenSquare } from "lucide-react";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import UserMenu from "./UserMenu";
 import { AnimatePresence } from "framer-motion";
@@ -112,19 +112,14 @@ export default function Sidebar({ user }) {
       </div>
       <div
         ref={navbarRef}
-        className={`absolute top-0 left-60 w-[calc(100%-240px)]
+        className={`absolute top-0 left-60 w-[calc(100%-240px)] bg-charcoal-gray-700 text-charcoal-gray-300
         ${isMobile ? "left-0 w-full" : ""}
         ${isResetting ? "transition-all ease-in-out duration-300" : ""} 
     `}
       >
-        <nav className="px-3 py-2 w-full">
-          {isCollapsed && (
-            <MenuIcon
-              onClick={resetWidth}
-              role="button"
-              className="h-6 w-6 text-charcoal-gray-300"
-            />
-          )}
+        <nav className="px-3 h-10 w-full flex items-center justify-between">
+          <MenuIcon onClick={resetWidth} role="button" size={24} />
+          <PenSquare role="button" size={20} />
         </nav>
       </div>
     </>
