@@ -2,13 +2,18 @@ import { Search } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import axios from "../axiosConfig";
 
-export default function SearchBar() {
+export default function SearchBar({ setSearchResult }) {
   const [searchValue, setSearchValue] = useState("");
   const isSearching = useRef(false);
+  const searchRef = useRef(null);
 
   useEffect(() => {
     if (searchValue.length < 2) return;
     handleSubmit();
+  }, [searchValue]);
+
+  useEffect(() => {
+    if (searchValue.length === 0) setSearchResult([]);
   }, [searchValue]);
 
   function handleSubmit(ev) {
@@ -18,7 +23,7 @@ export default function SearchBar() {
     axios
       .get(`/search/${searchValue}`)
       .then((response) => {
-        console.log(response.data);
+        setSearchResult(response.data);
         isSearching.current = false;
       })
       .catch((err) => {
@@ -29,7 +34,7 @@ export default function SearchBar() {
 
   return (
     <form onSubmit={handleSubmit} className="w-full overflow-hidden">
-      <div className="flex m-2 p-2 rounded-lg bg-charcoal-gray-900 border border-charcoal-gray-600 focus-within:border-charcoal-gray-400 transition duration-300">
+      <div className="flex p-2 rounded-lg bg-charcoal-gray-900 border border-charcoal-gray-600 focus-within:border-charcoal-gray-400 transition duration-300">
         <button className="" type="submit" role="button">
           <Search
             className="text-charcoal-gray-400 hover:text-charcoal-gray-300 transition duration-200"
@@ -37,6 +42,7 @@ export default function SearchBar() {
           />
         </button>
         <input
+          ref={searchRef}
           className="bg-charcoal-gray-900 px-2 w-full outline-none placeholder:text-charcoal-gray-400 focus:placeholder:text-charcoal-gray-300 text-charcoal-gray-300"
           placeholder="Search"
           type="text"

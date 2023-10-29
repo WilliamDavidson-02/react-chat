@@ -1,10 +1,10 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Profile from "./Profile";
 import { ChevronsLeft, MenuIcon, PenSquare } from "lucide-react";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import UserMenu from "./UserMenu";
 import { AnimatePresence } from "framer-motion";
-import SearchBar from "./SearchBar";
+import AddFriend from "./AddFriend";
 
 export default function Sidebar({ user }) {
   const isMobile = useMediaQuery("(max-width: 768px");
@@ -15,6 +15,24 @@ export default function Sidebar({ user }) {
   const [isCollapsed, setIsCollapsed] = useState(isMobile);
   const [isResetting, setIsResetting] = useState(false);
   const [userMenuToggle, setUserMenuToggle] = useState(false);
+  const [toggleAddFriend, setToggleAddFriend] = useState(false);
+
+  useEffect(() => {
+    // event listener for keydown
+    document.addEventListener("keydown", handleKeyDown);
+    // remove event listener for keydown
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  function handleKeyDown(ev) {
+    // command + k, else escape to close the add friend modal
+    if (ev.metaKey && ev.key === "k") {
+      ev.preventDefault();
+      setToggleAddFriend(true);
+    } else if (ev.key === "Escape") {
+      setToggleAddFriend(false);
+    }
+  }
 
   function handleMouseMove(ev) {
     if (!isResizingRef.current) return;
@@ -107,7 +125,6 @@ export default function Sidebar({ user }) {
               />
             )}
           </AnimatePresence>
-          <SearchBar />
         </div>
       </div>
       <div
@@ -119,9 +136,14 @@ export default function Sidebar({ user }) {
       >
         <nav className="px-3 h-10 w-full flex items-center justify-between">
           <MenuIcon onClick={resetWidth} role="button" size={24} />
-          <PenSquare role="button" size={20} />
+          <PenSquare
+            onClick={() => setToggleAddFriend(true)}
+            role="button"
+            size={20}
+          />
         </nav>
       </div>
+      {toggleAddFriend && <AddFriend setToggleAddFriend={setToggleAddFriend} />}
     </>
   );
 }

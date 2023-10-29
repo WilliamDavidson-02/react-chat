@@ -125,7 +125,16 @@ app.get("/api/search/:user", async (req, res) => {
         `first_name.ilike.%${firstName}%, last_name.ilike.%${lastName}%, email.ilike.%${user}%` // Matches any of the conditions
       );
 
-    res.status(200).json(data);
+    const usersFound = data.map((user) => {
+      const { first_name, last_name, profile_image } = user;
+      return {
+        firstName: first_name,
+        lastName: last_name,
+        profileImage: profile_image,
+      };
+    });
+
+    res.status(200).json(usersFound);
   } catch (error) {
     console.log(error);
     res

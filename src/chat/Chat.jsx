@@ -38,7 +38,7 @@ export default function Chat() {
 
   function handleSubmit(ev) {
     ev.preventDefault();
-    console.log(textareaValue.split("\n"));
+    console.log(textareaValue.trim());
   }
 
   function handleKeyDown(ev) {
