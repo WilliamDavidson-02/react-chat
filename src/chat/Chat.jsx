@@ -7,6 +7,7 @@ import SubmitBtn from "../shared/SubmitBtn";
 
 export default function Chat() {
   const [textareaValue, setTextareaValue] = useState("");
+  const messageRef = useRef(null);
   const textareaRef = useRef(null);
   const [user, setUser] = useState({
     firstName: "",
@@ -39,6 +40,7 @@ export default function Chat() {
   function handleSubmit(ev) {
     ev.preventDefault();
     console.log(textareaValue.trim());
+    setTextareaValue("");
   }
 
   function handleKeyDown(ev) {
@@ -53,9 +55,10 @@ export default function Chat() {
 
   return (
     <div className="relative w-screen max-w-screen overflow-hidden h-screen flex text-light-silver">
-      <Sidebar user={user} />
+      <Sidebar messageRef={messageRef} user={user} />
       <div
-        className={`h-full pt-10 px-4 flex-grow flex flex-col justify-between`}
+        ref={messageRef}
+        className="h-full pt-10 px-4 w-[calc(100%-240px)] flex flex-col justify-between"
       >
         <div>Messages</div>
         <form onSubmit={handleSubmit} className="flex items-end gap-2 py-4">

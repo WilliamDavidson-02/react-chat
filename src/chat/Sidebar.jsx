@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import Profile from "./Profile";
-import { ChevronsLeft, MenuIcon, PenSquare } from "lucide-react";
+import { ChevronsLeft, Command, MenuIcon, PenSquare } from "lucide-react";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import UserMenu from "./UserMenu";
 import { AnimatePresence } from "framer-motion";
 import AddFriend from "./AddFriend";
 
-export default function Sidebar({ user }) {
+export default function Sidebar({ user, messageRef }) {
   const isMobile = useMediaQuery("(max-width: 768px");
   const sidebarRef = useRef(null);
   const navbarRef = useRef(null);
@@ -18,9 +18,7 @@ export default function Sidebar({ user }) {
   const [toggleAddFriend, setToggleAddFriend] = useState(false);
 
   useEffect(() => {
-    // event listener for keydown
     document.addEventListener("keydown", handleKeyDown);
-    // remove event listener for keydown
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
@@ -35,7 +33,7 @@ export default function Sidebar({ user }) {
   }
 
   function handleMouseMove(ev) {
-    if (!isResizingRef.current) return;
+    if (!isResizingRef.current || isMobile) return;
     let newWidth = ev.clientX;
 
     if (newWidth < 240) newWidth = 240;
@@ -45,6 +43,10 @@ export default function Sidebar({ user }) {
       sidebarRef.current.style.width = `${newWidth}px`;
       navbarRef.current.style.setProperty("left", `${newWidth}px`);
       navbarRef.current.style.setProperty(
+        "width",
+        `calc(100% - ${newWidth}px)`
+      );
+      messageRef.current.style.setProperty(
         "width",
         `calc(100% - ${newWidth}px)`
       );
@@ -76,6 +78,14 @@ export default function Sidebar({ user }) {
         "width",
         isMobile ? "0" : "calc(100% - 240px)"
       );
+      messageRef.current.style.setProperty(
+        "width",
+        isMobile ? "0" : "calc(100% - 240px)"
+      );
+      messageRef.current.style.setProperty(
+        "padding",
+        isMobile ? "0" : "40px 16px 0px 16px"
+      );
       navbarRef.current.style.setProperty("left", isMobile ? "100%" : "240px");
       setTimeout(() => setIsResetting(false), 300);
     }
@@ -89,6 +99,8 @@ export default function Sidebar({ user }) {
       sidebarRef.current.style.width = "0";
       navbarRef.current.style.setProperty("width", "100%");
       navbarRef.current.style.setProperty("left", "0");
+      messageRef.current.style.setProperty("width", "100%");
+      messageRef.current.style.setProperty("padding", "40px 16px 0px 16px");
       setTimeout(() => setIsResetting(false), 300);
     }
   }
@@ -143,7 +155,11 @@ export default function Sidebar({ user }) {
           />
         </nav>
       </div>
-      {toggleAddFriend && <AddFriend setToggleAddFriend={setToggleAddFriend} />}
+      <AnimatePresence>
+        {toggleAddFriend && (
+          <AddFriend setToggleAddFriend={setToggleAddFriend} />
+        )}
+      </AnimatePresence>
     </>
   );
 }

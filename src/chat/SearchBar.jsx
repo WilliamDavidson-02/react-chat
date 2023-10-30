@@ -34,7 +34,7 @@ export default function SearchBar({ setSearchResult }) {
 
   return (
     <form onSubmit={handleSubmit} className="w-full overflow-hidden">
-      <div className="flex p-2 rounded-lg bg-charcoal-gray-900 border border-charcoal-gray-600 focus-within:border-charcoal-gray-400 transition duration-300">
+      <div className="flex items-center p-2 rounded-lg bg-charcoal-gray-900 border border-charcoal-gray-600 focus-within:border-charcoal-gray-400 transition duration-300">
         <button className="" type="submit" role="button">
           <Search
             className="text-charcoal-gray-400 hover:text-charcoal-gray-300 transition duration-200"
@@ -49,6 +49,9 @@ export default function SearchBar({ setSearchResult }) {
           value={searchValue}
           onChange={(ev) => setSearchValue(ev.target.value)}
         />
+        <div className="text-xs text-charcoal-gray-300 px-2 py-[3px] rounded-md border border-charcoal-gray-500 bg-charcoal-gray-600">
+          ESC
+        </div>
       </div>
     </form>
   );
