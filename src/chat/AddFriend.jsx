@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import SearchBar from "./SearchBar";
 import { motion } from "framer-motion";
+import Profile from "./Profile";
 
 export default function AddFriend({ setToggleAddFriend }) {
   const [searchResult, setSearchResult] = useState([]);
@@ -25,7 +26,7 @@ export default function AddFriend({ setToggleAddFriend }) {
         <SearchBar setSearchResult={setSearchResult} />
         {searchResult.length > 0 &&
           searchResult.map((user, index) => {
-            return <div key={index}>{user.firstName}</div>;
+            return <Profile key={index} user={user} />;
           })}
         {searchResult.length === 0 && (
           <div className="text-center text-lg text-charcoal-gray-400 select-none my-auto">

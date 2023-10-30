@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import Avatar from "../shared/Avatar";
 
 export default function Profile({ user, isCollapsed }) {
@@ -9,7 +9,13 @@ export default function Profile({ user, isCollapsed }) {
         !isCollapsed ? "px-4" : ""
       }`}
     >
-      <Avatar profileImage={user.profileImage} />
+      <Suspense
+        fallback={
+          <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-r from-charcoal-gray-500 to-charcoal-gray-400"></div>
+        }
+      >
+        <Avatar profileImage={user.profileImage} />
+      </Suspense>
       <div>
         <h4 className="font-semibold text-light-silver whitespace-nowrap">
           {user.firstName} {user.lastName}
