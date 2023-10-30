@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { Copy } from "lucide-react";
+import { UserContext } from "../context/UserContext";
 
 const userMenu = {
   open: {
@@ -15,8 +16,8 @@ const userMenu = {
   },
 };
 
-export default function UserMenu(props) {
-  const { userMenuToggle, setUserMenuToggle, user } = props;
+export default function UserMenu({ setUserMenuToggle }) {
+  const { user } = useContext(UserContext);
   const [isCopied, setIsCopied] = useState(false);
 
   const navigate = useNavigate();

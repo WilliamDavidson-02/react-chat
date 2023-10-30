@@ -2,9 +2,15 @@ import React, { useState } from "react";
 import SearchBar from "./SearchBar";
 import { motion } from "framer-motion";
 import Profile from "./Profile";
+import { UserPlus } from "lucide-react";
+import axios from "../axiosConfig";
 
 export default function AddFriend({ setToggleAddFriend }) {
   const [searchResult, setSearchResult] = useState([]);
+
+  function sendFriendRequest(friend) {
+    axios.post("/friend-request", { friend: friend.id });
+  }
 
   return (
     <motion.div
@@ -26,7 +32,18 @@ export default function AddFriend({ setToggleAddFriend }) {
         <SearchBar setSearchResult={setSearchResult} />
         {searchResult.length > 0 &&
           searchResult.map((user, index) => {
-            return <Profile key={index} user={user} />;
+            return (
+              <div key={index} className="flex justify-between items-center">
+                <Profile user={user} />
+                <div
+                  onClick={() => sendFriendRequest(user)}
+                  role="button"
+                  className="p-2 bg-forest-green border border-emerald-green rounded-md"
+                >
+                  <UserPlus size={24} />
+                </div>
+              </div>
+            );
           })}
         {searchResult.length === 0 && (
           <div className="text-center text-lg text-charcoal-gray-400 select-none my-auto">

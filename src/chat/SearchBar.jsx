@@ -1,8 +1,10 @@
 import { Search } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import axios from "../axiosConfig";
+import { UserContext } from "../context/UserContext";
 
 export default function SearchBar({ setSearchResult }) {
+  const { user } = useContext(UserContext);
   const [searchValue, setSearchValue] = useState("");
   const isSearching = useRef(false);
   const searchRef = useRef(null);
@@ -23,7 +25,11 @@ export default function SearchBar({ setSearchResult }) {
     axios
       .get(`/search/${searchValue}`)
       .then((response) => {
-        setSearchResult(response.data);
+        const currentUser = user.id;
+        const filteredUsers = response.data.filter(
+          (user) => user.id !== currentUser
+        );
+        setSearchResult(filteredUsers);
         isSearching.current = false;
       })
       .catch((err) => {

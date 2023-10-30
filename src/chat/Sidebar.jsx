@@ -1,12 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import Profile from "./Profile";
 import { ChevronsLeft, Command, MenuIcon, PenSquare } from "lucide-react";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import UserMenu from "./UserMenu";
 import { AnimatePresence } from "framer-motion";
 import AddFriend from "./AddFriend";
+import { UserContext } from "../context/UserContext";
 
-export default function Sidebar({ user, messageRef }) {
+export default function Sidebar({ messageRef }) {
+  const { user } = useContext(UserContext);
   const isMobile = useMediaQuery("(max-width: 768px");
   const sidebarRef = useRef(null);
   const navbarRef = useRef(null);
@@ -125,16 +127,16 @@ export default function Sidebar({ user, messageRef }) {
           <ChevronsLeft onClick={collapse} role="button" />
         </div>
         <div className="relative">
-          <div onClick={() => setUserMenuToggle(!userMenuToggle)}>
+          <div
+            role="button"
+            className="hover:bg-charcoal-gray-600 transition-all ease-in-out duration-300"
+            onClick={() => setUserMenuToggle(!userMenuToggle)}
+          >
             <Profile user={user} isCollapsed={isCollapsed} />
           </div>
           <AnimatePresence>
             {userMenuToggle && (
-              <UserMenu
-                userMenuToggle={userMenuToggle}
-                setUserMenuToggle={setUserMenuToggle}
-                user={user}
-              />
+              <UserMenu setUserMenuToggle={setUserMenuToggle} />
             )}
           </AnimatePresence>
         </div>

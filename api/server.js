@@ -30,17 +30,18 @@ app.get("/api/user", async (req, res) => {
     const email = jwt.verify(token, process.env.JWT_SECRET_KEY);
     const { data } = await supabase
       .from("users")
-      .select("first_name, last_name, profile_image")
+      .select("id, first_name, last_name, profile_image")
       .eq("email", email);
 
     if (data.length === 0)
       return res.status(404).json({ message: "User not found" });
-    const { first_name, last_name, profile_image } = data[0];
+    const { first_name, last_name, profile_image, id } = data[0];
     res.status(200).json({
       email,
       firstName: first_name,
       lastName: last_name,
       profileImage: profile_image,
+      id,
     });
   } catch (error) {
     console.log(error);
@@ -120,17 +121,18 @@ app.get("/api/search/:user", async (req, res) => {
   try {
     const { data, error } = await supabase
       .from("users")
-      .select("first_name, last_name, profile_image")
+      .select("id, first_name, last_name, profile_image")
       .or(
         `first_name.ilike.%${firstName}%, last_name.ilike.%${lastName}%, email.ilike.%${user}%` // Matches any of the conditions
       );
 
     const usersFound = data.map((user) => {
-      const { first_name, last_name, profile_image } = user;
+      const { first_name, last_name, profile_image, id } = user;
       return {
         firstName: first_name,
         lastName: last_name,
         profileImage: profile_image,
+        id,
       };
     });
 

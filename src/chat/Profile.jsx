@@ -1,11 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
 import Avatar from "../shared/Avatar";
 
-export default function Profile({ user, isCollapsed }) {
+export default function Profile({ isCollapsed, user }) {
   return (
     <div
-      role="button"
-      className={`hover:bg-charcoal-gray-600 transition-all ease-in-out duration-300 py-2 w-full flex items-center gap-2 overflow-hidden ${
+      className={`py-2 w-full flex items-center gap-2 overflow-hidden ${
         !isCollapsed ? "px-4" : ""
       }`}
     >
