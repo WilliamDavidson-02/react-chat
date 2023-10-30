@@ -59,7 +59,7 @@ app.post("/api/register", async (req, res) => {
     .select("email")
     .eq("email", email);
 
-  if (data)
+  if (data.length > 0)
     return res.status(409).json({
       message: `Email already exists, sign in with ${email} or try another email.`,
     });

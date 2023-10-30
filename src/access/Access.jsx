@@ -9,7 +9,7 @@ import Name from "./Name";
 import ErrorNotification from "../shared/ErrorNotification";
 import { AnimatePresence } from "framer-motion";
 import Cookies from "js-cookie";
-import { colorPallet } from "../shared/colorPallet";
+import { colorPallet } from "../shared/Avatar";
 import { Github } from "lucide-react";
 
 export default function Access() {
