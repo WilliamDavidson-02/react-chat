@@ -23,13 +23,9 @@ export default function SearchBar({ setSearchResult }) {
     if (isSearching.current) return;
     isSearching.current = true;
     axios
-      .get(`/search/${searchValue}`)
+      .get(`/search/${searchValue}/${user.id}`)
       .then((response) => {
-        const currentUser = user.id;
-        const filteredUsers = response.data.filter(
-          (user) => user.id !== currentUser
-        );
-        setSearchResult(filteredUsers);
+        setSearchResult(response.data);
         isSearching.current = false;
       })
       .catch((err) => {

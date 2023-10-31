@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const { CloudFog } = require("lucide-react");
 const app = express();
 
 const salt = bcrypt.genSaltSync(10);
@@ -30,8 +31,14 @@ app.get("/api/user", async (req, res) => {
     const email = jwt.verify(token, process.env.JWT_SECRET_KEY);
     const { data } = await supabase
       .from("users")
-      .select("id, first_name, last_name, profile_image")
+      .select(
+        "id, first_name, last_name, profile_image, friend_requests:friend_requests_sender_id_fkey (recipient_id)"
+      )
       .eq("email", email);
+
+    const recipientIds = data[0].friend_requests.map(
+      (request) => request.recipient_id
+    );
 
     if (data.length === 0)
       return res.status(404).json({ message: "User not found" });
@@ -42,6 +49,7 @@ app.get("/api/user", async (req, res) => {
       lastName: last_name,
       profileImage: profile_image,
       id,
+      recipientIds,
     });
   } catch (error) {
     console.log(error);
@@ -114,17 +122,18 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-app.get("/api/search/:user", async (req, res) => {
-  const { user = "" } = req.params;
+app.get("/api/search/:user/:id", async (req, res) => {
+  const { user = "", id } = req.params;
   const [firstName = user, lastName = user] = user.split(" ");
 
   try {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("users")
       .select("id, first_name, last_name, profile_image")
       .or(
         `first_name.ilike.%${firstName}%, last_name.ilike.%${lastName}%, email.ilike.%${user}%` // Matches any of the conditions
-      );
+      )
+      .neq("id", id);
 
     const usersFound = data.map((user) => {
       const { first_name, last_name, profile_image, id } = user;
@@ -142,6 +151,28 @@ app.get("/api/search/:user", async (req, res) => {
     res
       .status(500)
       .json({ message: "Error while retrieving your information" });
+  }
+});
+
+app.post("/api/friend-request", async (req, res) => {
+  const { searchedUser, user } = req.body;
+
+  try {
+    const { error } = await supabase.from("friend_requests").insert({
+      sender_id: user,
+      recipient_id: searchedUser,
+    });
+
+    if (error) {
+      return res
+        .status(500)
+        .json({ message: "Error while sending friend request" });
+    }
+
+    res.status(200).json({ message: "Friend request sent" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error while sending friend request" });
   }
 });
 

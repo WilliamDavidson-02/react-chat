@@ -1,20 +1,21 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 
 export default function ErrorNotification(props) {
   const { message, index, setErrorNotifications } = props;
-
-  let removeNotification;
+  const removeNotification = useRef();
 
   useEffect(() => {
-    removeNotification = setTimeout(() => {
-      setErrorNotifications((prev) => prev.filter((_, idx) => idx !== index));
+    removeNotification.current = setTimeout(() => {
+      setErrorNotifications((prev) => prev.slice(1));
     }, 5000);
+
+    return () => clearTimeout(removeNotification.current);
   }, []);
 
   function removeNotificationCard() {
-    setErrorNotifications((prev) => prev.filter((_, idx) => idx !== index));
-    clearTimeout(removeNotification);
+    setErrorNotifications((prev) => prev.slice(1));
+    clearTimeout(removeNotification.current);
   }
 
   return (
