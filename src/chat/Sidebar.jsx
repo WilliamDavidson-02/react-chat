@@ -25,7 +25,6 @@ export default function Sidebar({ messageRef }) {
   }, []);
 
   function handleKeyDown(ev) {
-    // command + k, else escape to close the add friend modal
     if (ev.metaKey && ev.key === "k") {
       ev.preventDefault();
       setToggleAddFriend(true);

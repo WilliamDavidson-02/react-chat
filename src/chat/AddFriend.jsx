@@ -8,7 +8,7 @@ import { UserContext } from "../context/UserContext";
 import ErrorNotification from "../shared/ErrorNotification";
 
 export default function AddFriend({ setToggleAddFriend }) {
-  const { user } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const [searchResult, setSearchResult] = useState([]);
   const [errorNotifications, setErrorNotifications] = useState([]);
 
@@ -16,6 +16,12 @@ export default function AddFriend({ setToggleAddFriend }) {
     if (user.recipientIds.includes(searchedUser.id)) return;
     axios
       .post("/friend-request", { searchedUser: searchedUser.id, user: user.id })
+      .then(() =>
+        setUser((prev) => ({
+          ...prev,
+          recipientIds: [...prev.recipientIds, searchedUser.id],
+        }))
+      )
       .catch((err) => {
         setErrorNotifications((prev) => [...prev, err.response.data.message]);
       });

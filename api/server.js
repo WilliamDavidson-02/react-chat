@@ -29,20 +29,27 @@ app.get("/api/user", async (req, res) => {
 
   try {
     const email = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    const { data } = await supabase
+    const { data: user, error } = await supabase
       .from("users")
       .select(
-        "id, first_name, last_name, profile_image, friend_requests:friend_requests_sender_id_fkey (recipient_id)"
+        "id, first_name, last_name, profile_image, friend_requests(recipient_id)"
       )
       .eq("email", email);
 
-    const recipientIds = data[0].friend_requests.map(
-      (request) => request.recipient_id
-    );
+    console.log(user, error);
 
-    if (data.length === 0)
+    if (user.length === 0)
       return res.status(404).json({ message: "User not found" });
-    const { first_name, last_name, profile_image, id } = data[0];
+
+    let recipientIds = [];
+
+    if (user[0].friend_requests) {
+      recipientIds = user[0].friend_requests.map(
+        (request) => request.recipient_id
+      );
+    }
+
+    const { first_name, last_name, profile_image, id } = user[0];
     res.status(200).json({
       email,
       firstName: first_name,
