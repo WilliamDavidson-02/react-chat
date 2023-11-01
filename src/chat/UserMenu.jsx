@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import { Copy } from "lucide-react";
+import { Copy, UserPlus } from "lucide-react";
 import { UserContext } from "../context/UserContext";
 
 const userMenu = {
@@ -16,7 +16,10 @@ const userMenu = {
   },
 };
 
-export default function UserMenu({ setUserMenuToggle }) {
+export default function UserMenu({
+  setUserMenuToggle,
+  setToggleFriendRequests,
+}) {
   const { user } = useContext(UserContext);
   const [isCopied, setIsCopied] = useState(false);
 
@@ -31,6 +34,11 @@ export default function UserMenu({ setUserMenuToggle }) {
     setIsCopied(true);
     navigator.clipboard.writeText(user.email);
     setTimeout(() => setIsCopied(false), 1000);
+  }
+
+  function handleFriendRequestsToggle() {
+    setToggleFriendRequests(true);
+    setUserMenuToggle(false);
   }
 
   return (
@@ -80,6 +88,15 @@ export default function UserMenu({ setUserMenuToggle }) {
               <Copy size={16} />
             )}
           </motion.div>
+        </div>
+        <div className="w-full h-[1px] bg-charcoal-gray-500"></div>
+        <div
+          onClick={handleFriendRequestsToggle}
+          role="button"
+          className="px-4 py-2 hover:bg-charcoal-gray-600 transition duration-200 rounded-lg flex justify-between items-center"
+        >
+          <span>Friend requests</span>
+          <UserPlus size={16} />
         </div>
         <div className="w-full h-[1px] bg-charcoal-gray-500"></div>
         <div

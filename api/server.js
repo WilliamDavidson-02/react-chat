@@ -36,8 +36,6 @@ app.get("/api/user", async (req, res) => {
       )
       .eq("email", email);
 
-    console.log(user, error);
-
     if (user.length === 0)
       return res.status(404).json({ message: "User not found" });
 
@@ -180,6 +178,37 @@ app.post("/api/friend-request", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Error while sending friend request" });
+  }
+});
+
+app.get("/api/friend-requests-users/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const { data, error } = await supabase
+      .from("friend_requests")
+      .select("users (id, first_name, last_name, profile_image)")
+      .eq("recipient_id", id);
+
+    if (data.length === 0) {
+      return res.status(404).json({ message: "Users not found" });
+    }
+
+    const usersFound = data.map((user) => {
+      const { first_name, last_name, profile_image, id } = user.users;
+      return {
+        firstName: first_name,
+        lastName: last_name,
+        profileImage: profile_image,
+        id,
+      };
+    });
+    res.status(200).json(usersFound);
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ message: "Error while retrieving your friend requests" });
   }
 });
 

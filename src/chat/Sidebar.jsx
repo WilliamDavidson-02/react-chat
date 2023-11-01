@@ -6,6 +6,8 @@ import UserMenu from "./UserMenu";
 import { AnimatePresence } from "framer-motion";
 import AddFriend from "./AddFriend";
 import { UserContext } from "../context/UserContext";
+import FriendRequests from "./FriendRequests";
+import FormModal from "../shared/FormModal";
 
 export default function Sidebar({ messageRef }) {
   const { user } = useContext(UserContext);
@@ -18,6 +20,7 @@ export default function Sidebar({ messageRef }) {
   const [isResetting, setIsResetting] = useState(false);
   const [userMenuToggle, setUserMenuToggle] = useState(false);
   const [toggleAddFriend, setToggleAddFriend] = useState(false);
+  const [toggleFriendRequests, setToggleFriendRequests] = useState(false);
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
@@ -135,7 +138,10 @@ export default function Sidebar({ messageRef }) {
           </div>
           <AnimatePresence>
             {userMenuToggle && (
-              <UserMenu setUserMenuToggle={setUserMenuToggle} />
+              <UserMenu
+                setToggleFriendRequests={setToggleFriendRequests}
+                setUserMenuToggle={setUserMenuToggle}
+              />
             )}
           </AnimatePresence>
         </div>
@@ -158,7 +164,14 @@ export default function Sidebar({ messageRef }) {
       </div>
       <AnimatePresence>
         {toggleAddFriend && (
-          <AddFriend setToggleAddFriend={setToggleAddFriend} />
+          <FormModal setToggleModal={setToggleAddFriend}>
+            <AddFriend />
+          </FormModal>
+        )}
+        {toggleFriendRequests && (
+          <FormModal setToggleModal={setToggleFriendRequests}>
+            <FriendRequests />
+          </FormModal>
         )}
       </AnimatePresence>
     </>
