@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { UserContext } from "../context/UserContext";
 import axios from "../axiosConfig";
 import Profile from "./Profile";
-import { UserPlus } from "lucide-react";
+import { Check } from "lucide-react";
 import ErrorNotification from "../shared/ErrorNotification";
 
 export default function FriendRequests() {
@@ -56,7 +56,7 @@ export default function FriendRequests() {
                 role="button"
                 className={`p-2 text-emerald-green cursor-default border border-emerald-green rounded-md`}
               >
-                <UserPlus size={24} />
+                <Check size={24} />
               </div>
             </div>
           );

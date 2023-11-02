@@ -39,13 +39,29 @@ app.get("/api/user", async (req, res) => {
     if (user.length === 0)
       return res.status(404).json({ message: "User not found" });
 
-    let recipientIds = [];
+    let requestedFriendIds = [];
 
     if (user[0].friend_requests) {
-      recipientIds = user[0].friend_requests.map(
+      requestedFriendIds = user[0].friend_requests.map(
         (request) => request.recipient_id
       );
     }
+
+    const { data: friends } = await supabase
+      .from("users")
+      .select("id, first_name, last_name, profile_image")
+      .in("id", requestedFriendIds);
+
+    const friendList = friends.map((friend) => {
+      const { id, first_name, last_name, profile_image } = friend;
+      return {
+        id,
+        firstName: first_name,
+        lastName: last_name,
+        profileImage: profile_image,
+        isFriend: requestedFriendIds.includes(id) ? false : true,
+      };
+    });
 
     const { first_name, last_name, profile_image, id } = user[0];
     res.status(200).json({
@@ -54,7 +70,8 @@ app.get("/api/user", async (req, res) => {
       lastName: last_name,
       profileImage: profile_image,
       id,
-      recipientIds,
+      requestedFriendIds,
+      friendList,
     });
   } catch (error) {
     console.log(error);

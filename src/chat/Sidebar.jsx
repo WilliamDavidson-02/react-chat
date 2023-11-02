@@ -145,6 +145,20 @@ export default function Sidebar({ messageRef }) {
             )}
           </AnimatePresence>
         </div>
+        <div>
+          <div className="w-[calc(100%-16px)] h-[1px] mx-auto my-4 bg-charcoal-gray-500"></div>
+          {user.friendList?.map((friend, index) => {
+            return (
+              <div
+                key={index}
+                role="button"
+                className="hover:bg-charcoal-gray-600 transition-all ease-in-out duration-300"
+              >
+                <Profile user={friend} isCollapsed={isCollapsed} />
+              </div>
+            );
+          })}
+        </div>
       </div>
       <div
         ref={navbarRef}

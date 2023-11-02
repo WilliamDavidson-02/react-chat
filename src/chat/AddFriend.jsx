@@ -13,13 +13,13 @@ export default function AddFriend() {
   const [errorNotifications, setErrorNotifications] = useState([]);
 
   function sendFriendRequest(searchedUser) {
-    if (user.recipientIds.includes(searchedUser.id)) return;
+    if (user.requestedFriendIds.includes(searchedUser.id)) return;
     axios
       .post("/friend-request", { searchedUser: searchedUser.id, user: user.id })
       .then(() =>
         setUser((prev) => ({
           ...prev,
-          recipientIds: [...prev.recipientIds, searchedUser.id],
+          requestedFriendIds: [...prev.requestedFriendIds, searchedUser.id],
         }))
       )
       .catch((err) => {
@@ -63,7 +63,7 @@ export default function AddFriend() {
                   role="button"
                   className={`p-2 
                     ${
-                      !user.recipientIds.includes(searchedUser.id)
+                      !user.requestedFriendIds.includes(searchedUser.id)
                         ? "bg-forest-green"
                         : "text-emerald-green cursor-default"
                     } border border-emerald-green rounded-md`}

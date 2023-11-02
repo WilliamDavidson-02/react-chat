@@ -21,16 +21,8 @@ export function UserProvider({ children }) {
       navigate("/");
     } else {
       axios.get("/user").then((response) => {
-        const { firstName, lastName, email, profileImage, id, recipientIds } =
-          response.data;
-        setUser({
-          firstName,
-          lastName,
-          email,
-          profileImage,
-          id,
-          recipientIds,
-        });
+        console.log(response.data);
+        setUser(response.data);
       });
     }
   }, []);
