@@ -9,7 +9,11 @@ import { UserContext } from "../context/UserContext";
 import FriendRequests from "./FriendRequests";
 import FormModal from "../shared/FormModal";
 
-export default function Sidebar({ messageRef }) {
+export default function Sidebar({
+  messageRef,
+  setSelectedFriend,
+  selectedFriend,
+}) {
   const { user } = useContext(UserContext);
   const isMobile = useMediaQuery("(max-width: 768px");
   const sidebarRef = useRef(null);
@@ -152,6 +156,7 @@ export default function Sidebar({ messageRef }) {
               <div
                 key={index}
                 role="button"
+                onClick={() => setSelectedFriend(index)}
                 className="hover:bg-charcoal-gray-600 transition-all ease-in-out duration-300"
               >
                 <Profile user={friend} isCollapsed={isCollapsed} />
@@ -169,6 +174,12 @@ export default function Sidebar({ messageRef }) {
       >
         <nav className="px-3 h-10 w-full flex items-center justify-between">
           <MenuIcon onClick={resetWidth} role="button" size={24} />
+          {selectedFriend !== null && (
+            <span>
+              {user.friendList[selectedFriend].firstName}{" "}
+              {user.friendList[selectedFriend].lastName}
+            </span>
+          )}
           <PenSquare
             onClick={() => setToggleAddFriend(true)}
             role="button"

@@ -1,8 +1,11 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import Sidebar from "./Sidebar";
 import SubmitBtn from "../shared/SubmitBtn";
+import { UserContext } from "../context/UserContext";
 
 export default function Chat() {
+  const { user } = useContext(UserContext);
+  const [selectedFriend, setSelectedFriend] = useState(null); // index, integer
   const [textareaValue, setTextareaValue] = useState("");
   const messageRef = useRef(null);
   const textareaRef = useRef(null);
@@ -31,9 +34,20 @@ export default function Chat() {
     }
   }
 
+  function handleInputAreaChange(ev) {
+    if (selectedFriend === null) return;
+    if (!user.friendList[selectedFriend].isFriend) return;
+
+    setTextareaValue(ev.target.value);
+  }
+
   return (
     <div className="relative w-screen max-w-screen overflow-hidden h-screen flex text-light-silver">
-      <Sidebar messageRef={messageRef} />
+      <Sidebar
+        setSelectedFriend={setSelectedFriend}
+        selectedFriend={selectedFriend}
+        messageRef={messageRef}
+      />
       <div
         ref={messageRef}
         className="h-full pt-10 px-4 w-[calc(100%-240px)] flex flex-col justify-between"
@@ -43,7 +57,7 @@ export default function Chat() {
           <textarea
             ref={textareaRef}
             value={textareaValue}
-            onChange={(ev) => setTextareaValue(ev.target.value)}
+            onChange={handleInputAreaChange}
             onKeyDown={handleKeyDown}
             placeholder="Type a message"
             rows={1}
