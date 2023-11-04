@@ -37,7 +37,6 @@ export default function Chat() {
 
   function handleInputAreaChange(ev) {
     if (selectedFriend === null) return;
-
     setTextareaValue(ev.target.value);
   }
 

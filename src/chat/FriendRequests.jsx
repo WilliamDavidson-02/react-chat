@@ -3,11 +3,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import { UserContext } from "../context/UserContext";
 import axios from "../axiosConfig";
 import Profile from "./Profile";
-import { Check } from "lucide-react";
+import { Check, X } from "lucide-react";
 import ErrorNotification from "../shared/ErrorNotification";
 
 export default function FriendRequests() {
-  const { user } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const [friendRequests, setFriendRequests] = useState([]);
   const [errorNotifications, setErrorNotifications] = useState([]);
 
@@ -19,6 +19,40 @@ export default function FriendRequests() {
         setErrorNotifications((prev) => [...prev, err.response.data.message]);
       });
   }, []);
+
+  function handleFriendRequest(answer, friendId, userIndex) {
+    axios
+      .post("/answer-friend-request", { answer, friendId, userId: user.id })
+      .then(() => {
+        let isInFriendList = false;
+        let updatedFriendList = user.friendList;
+
+        user.friendList.foreach((user, index) => {
+          if (user.id === friendId) {
+            isInFriendList = true;
+            updatedFriendList[index].isFriend = true;
+          }
+        });
+
+        if (!isInFriendList) {
+          updatedFriendList = [
+            ...updatedFriendList,
+            { ...friendRequests[userIndex], isFriend: true },
+          ];
+        }
+
+        setUser((prev) => ({
+          ...prev,
+          friendList: updatedFriendList,
+        }));
+        setFriendRequests((prev) =>
+          prev.filter((user) => user.id !== friendId)
+        );
+      })
+      .catch((err) =>
+        setErrorNotifications((prev) => [...prev, err.response.data.message])
+      );
+  }
 
   return (
     <>
@@ -54,9 +88,21 @@ export default function FriendRequests() {
               <Profile user={userFriend} />
               <div
                 role="button"
-                className={`p-2 text-emerald-green cursor-default border border-emerald-green rounded-md`}
+                onClick={() =>
+                  handleFriendRequest("accept", userFriend.id, index)
+                }
+                className="p-2 text-emerald-green hover:text-charcoal-gray-500 hover:bg-emerald-green transition duration-300 border border-emerald-green rounded-md mr-4"
               >
                 <Check size={24} />
+              </div>
+              <div
+                role="button"
+                onClick={() =>
+                  handleFriendRequest("decline", userFriend.id, index)
+                }
+                className="p-2 text-red-500 hover:text-charcoal-gray-500 hover:bg-red-500 transition duration-300 border border-red-500 rounded-md"
+              >
+                <X size={24} />
               </div>
             </div>
           );

@@ -32,25 +32,32 @@ app.get("/api/user", async (req, res) => {
     const { data: user, error } = await supabase
       .from("users")
       .select(
-        "id, first_name, last_name, profile_image, friend_requests(recipient_id)"
+        "id, first_name, last_name, profile_image, friend_requests(recipient_id), user_friends(friend_id)"
       )
       .eq("email", email);
+
+    console.log(user[0], error);
 
     if (user.length === 0)
       return res.status(404).json({ message: "User not found" });
 
     let requestedFriendIds = [];
+    let friendsIds = [];
 
-    if (user[0].friend_requests) {
+    if (user[0].friend_requests.length !== 0) {
       requestedFriendIds = user[0].friend_requests.map(
         (request) => request.recipient_id
       );
     }
 
+    if (user[0].user_friends.length !== 0) {
+      friendsIds = user[0].user_friends.map((request) => request.friend_id);
+    }
+
     const { data: friends } = await supabase
       .from("users")
       .select("id, first_name, last_name, profile_image")
-      .in("id", requestedFriendIds);
+      .in("id", [...requestedFriendIds, ...friendsIds]);
 
     const friendList = friends.map((friend) => {
       const { id, first_name, last_name, profile_image } = friend;
@@ -226,6 +233,39 @@ app.get("/api/friend-requests-users/:id", async (req, res) => {
     res
       .status(500)
       .json({ message: "Error while retrieving your friend requests" });
+  }
+});
+
+app.post("/api/answer-friend-request", async (req, res) => {
+  const { answer, friendId, userId } = req.body;
+
+  try {
+    const { error } = await supabase
+      .from("friend_requests")
+      .delete()
+      .match({ recipient_id: friendId, sender_id: userId });
+
+    if (error) {
+      return res
+        .status(500)
+        .json({ message: "Error while handling friend request." });
+    }
+
+    if (answer === "accept") {
+      const { error } = await supabase
+        .from("user_friends")
+        .insert({ user_id: userId, friend_id: friendId });
+
+      if (error) {
+        return res
+          .status(500)
+          .json({ message: "Error while handling friend request." });
+      }
+    }
+    res.status(200).send("ok");
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error while handling friend request." });
   }
 });
 
