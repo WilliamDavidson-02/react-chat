@@ -20,6 +20,10 @@ export default function AddFriend() {
         setUser((prev) => ({
           ...prev,
           requestedFriendIds: [...prev.requestedFriendIds, searchedUser.id],
+          friendList: [
+            ...prev.friendList,
+            { ...searchedUser, isFriend: false },
+          ],
         }))
       )
       .catch((err) => {

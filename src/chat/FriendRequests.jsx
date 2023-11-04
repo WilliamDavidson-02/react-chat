@@ -49,9 +49,9 @@ export default function FriendRequests() {
           prev.filter((user) => user.id !== friendId)
         );
       })
-      .catch((err) =>
-        setErrorNotifications((prev) => [...prev, err.response.data.message])
-      );
+      .catch((err) => {
+        setErrorNotifications((prev) => [...prev, err.response.data.message]);
+      });
   }
 
   return (

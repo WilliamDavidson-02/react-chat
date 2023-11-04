@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-const { CloudFog } = require("lucide-react");
+const { CloudFog, LeafyGreen } = require("lucide-react");
 const app = express();
 
 const salt = bcrypt.genSaltSync(10);
@@ -29,17 +29,20 @@ app.get("/api/user", async (req, res) => {
 
   try {
     const email = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    const { data: user, error } = await supabase
+    const { data: user } = await supabase
       .from("users")
       .select(
-        "id, first_name, last_name, profile_image, friend_requests(recipient_id), user_friends(friend_id)"
+        "id, first_name, last_name, profile_image, friend_requests(recipient_id)"
       )
       .eq("email", email);
 
-    console.log(user[0], error);
-
     if (user.length === 0)
       return res.status(404).json({ message: "User not found" });
+
+    const { data: friendship } = await supabase
+      .from("friendship")
+      .select("*")
+      .or(`user_id.eq.${user[0].id}, friend_id.eq.${user[0].id}`);
 
     let requestedFriendIds = [];
     let friendsIds = [];
@@ -50,8 +53,12 @@ app.get("/api/user", async (req, res) => {
       );
     }
 
-    if (user[0].user_friends.length !== 0) {
-      friendsIds = user[0].user_friends.map((request) => request.friend_id);
+    if (friendship.length !== 0) {
+      friendsIds = friendship.map((friend) => {
+        const { friend_id, user_id } = friend;
+        if (friend_id === user[0].id) return user_id; // User to accept friend req, if the friend is logged in the user_id becomes the friend_id.
+        return friend_id;
+      });
     }
 
     const { data: friends } = await supabase
@@ -214,10 +221,6 @@ app.get("/api/friend-requests-users/:id", async (req, res) => {
       .select("users (id, first_name, last_name, profile_image)")
       .eq("recipient_id", id);
 
-    if (data.length === 0) {
-      return res.status(404).json({ message: "Users not found" });
-    }
-
     const usersFound = data.map((user) => {
       const { first_name, last_name, profile_image, id } = user.users;
       return {
@@ -246,6 +249,7 @@ app.post("/api/answer-friend-request", async (req, res) => {
       .match({ recipient_id: friendId, sender_id: userId });
 
     if (error) {
+      console.log(error);
       return res
         .status(500)
         .json({ message: "Error while handling friend request." });
@@ -253,10 +257,11 @@ app.post("/api/answer-friend-request", async (req, res) => {
 
     if (answer === "accept") {
       const { error } = await supabase
-        .from("user_friends")
+        .from("friendship")
         .insert({ user_id: userId, friend_id: friendId });
 
       if (error) {
+        console.log(error);
         return res
           .status(500)
           .json({ message: "Error while handling friend request." });
