@@ -246,7 +246,7 @@ app.post("/api/answer-friend-request", async (req, res) => {
     const { error } = await supabase
       .from("friend_requests")
       .delete()
-      .match({ recipient_id: friendId, sender_id: userId });
+      .match({ recipient_id: userId, sender_id: friendId });
 
     if (error) {
       console.log(error);
@@ -267,7 +267,7 @@ app.post("/api/answer-friend-request", async (req, res) => {
           .json({ message: "Error while handling friend request." });
       }
     }
-    res.status(200).send("ok");
+    res.status(200).json({ message: "ok" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Error while handling friend request." });

@@ -25,7 +25,13 @@ export default function SearchBar({ setSearchResult }) {
     axios
       .get(`/search/${searchValue}/${user.id}`)
       .then((response) => {
-        setSearchResult(response.data);
+        // Filter away the users that you are already friends with.
+        const filteredResponse = response.data.filter((searchedUser) => {
+          return !user.friendList.some((friend) => {
+            return friend.id === searchedUser.id && friend.isFriend;
+          });
+        });
+        setSearchResult(filteredResponse);
         isSearching.current = false;
       })
       .catch((err) => {

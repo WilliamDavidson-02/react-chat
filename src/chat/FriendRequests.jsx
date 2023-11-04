@@ -27,7 +27,7 @@ export default function FriendRequests() {
         let isInFriendList = false;
         let updatedFriendList = user.friendList;
 
-        user.friendList.foreach((user, index) => {
+        updatedFriendList.forEach((user, index) => {
           if (user.id === friendId) {
             isInFriendList = true;
             updatedFriendList[index].isFriend = true;
@@ -50,6 +50,7 @@ export default function FriendRequests() {
         );
       })
       .catch((err) => {
+        console.log(err);
         setErrorNotifications((prev) => [...prev, err.response.data.message]);
       });
   }
