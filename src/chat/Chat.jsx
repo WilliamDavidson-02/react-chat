@@ -3,10 +3,12 @@ import Sidebar from "./Sidebar";
 import SubmitBtn from "../shared/SubmitBtn";
 import { UserContext } from "../context/UserContext";
 import Profile from "./Profile";
+import axios from "axios";
 
 export default function Chat() {
   const { user } = useContext(UserContext);
   const [selectedFriend, setSelectedFriend] = useState(null); // index, integer
+  const [messages, setMessages] = useState([]);
   const [textareaValue, setTextareaValue] = useState("");
   const messageRef = useRef(null);
   const textareaRef = useRef(null);
@@ -19,10 +21,33 @@ export default function Chat() {
     textareaRef.current.style.height = `${scrollHeight}px`;
   }, [textareaValue, textareaRef]);
 
+  useEffect(() => {
+    if (selectedFriend !== null && user.friendList[selectedFriend].isFriend) {
+      axios
+        .get(`/get-messages/${user.id}/${user.friendList[selectedFriend].id}`)
+        .then((response) => setMessages(response.data.messages))
+        .catch((error) => console.log(error));
+    }
+  }, [selectedFriend]);
+
+  function sanitizeText(text) {
+    return text.replace("<", "&lt;").replace(">", "&gt;");
+  }
+
   function handleSubmit(ev) {
     ev.preventDefault();
-    console.log(textareaValue.trim());
-    setTextareaValue("");
+    const messageValue = sanitizeText(textareaValue).trim();
+    axios
+      .post("/send-message", {
+        messageValue,
+        senderId: user.id,
+        recipientId: user.friendList[selectedFriend].id,
+      })
+      .then((response) => {
+        setMessages((prev) => [...prev, response.data.message]);
+        setTextareaValue("");
+      })
+      .catch((error) => console.log(error));
   }
 
   function handleKeyDown(ev) {
@@ -33,11 +58,6 @@ export default function Chat() {
       ev.preventDefault();
       handleSubmit(ev);
     }
-  }
-
-  function handleInputAreaChange(ev) {
-    if (selectedFriend === null) return;
-    setTextareaValue(ev.target.value);
   }
 
   return (
@@ -54,7 +74,22 @@ export default function Chat() {
         {selectedFriend !== null ? (
           user.friendList[selectedFriend].isFriend ? (
             <>
-              <div>Messages</div>
+              <div className="flex flex-col gap-2 py-4">
+                {messages.map((message, index) => {
+                  return (
+                    <div
+                      key={index}
+                      className={`p-2 rounded-lg border max-w-full md:max-w-1/2 ${
+                        message.sender_id === user.id
+                          ? "bg-forest-green border-emerald-green ml-auto text-end"
+                          : "bg-charcoal-gray-500 border-charcoal-gray-300 mr-auto"
+                      }`}
+                    >
+                      {message.message}
+                    </div>
+                  );
+                })}
+              </div>
               <form
                 onSubmit={handleSubmit}
                 className="flex items-end gap-2 py-4"
@@ -62,7 +97,7 @@ export default function Chat() {
                 <textarea
                   ref={textareaRef}
                   value={textareaValue}
-                  onChange={handleInputAreaChange}
+                  onChange={(ev) => setTextareaValue(ev.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="Type a message"
                   rows={1}

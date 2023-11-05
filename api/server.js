@@ -274,6 +274,43 @@ app.post("/api/answer-friend-request", async (req, res) => {
   }
 });
 
+app.post("/api/send-message", async (req, res) => {
+  const { messageValue, senderId, recipientId } = req.body;
+
+  try {
+    const { data } = await supabase
+      .from("messages")
+      .insert({
+        message: messageValue,
+        sender_id: senderId,
+        recipient_id: recipientId,
+      })
+      .select();
+
+    res.status(200).json({ message: data[0] });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error while sending message." });
+  }
+});
+
+app.get("/api/get-messages/:senderId/:recipientId", async (req, res) => {
+  const { senderId, recipientId } = req.params;
+  const ids = [senderId, recipientId];
+
+  try {
+    const { data } = await supabase
+      .from("messages")
+      .select("*")
+      .or(`sender_id.in.(${ids}), recipient_id.in.(${ids})`);
+
+    res.status(200).json({ messages: data });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error while getting messages." });
+  }
+});
+
 if (process.env.APP_PORT) app.listen(process.env.APP_PORT);
 
 module.exports = app;
