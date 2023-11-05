@@ -4,6 +4,12 @@ import SubmitBtn from "../shared/SubmitBtn";
 import { UserContext } from "../context/UserContext";
 import Profile from "./Profile";
 import axios from "axios";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_KEY
+);
 
 export default function Chat() {
   const { user } = useContext(UserContext);
@@ -11,7 +17,36 @@ export default function Chat() {
   const [messages, setMessages] = useState([]);
   const [textareaValue, setTextareaValue] = useState("");
   const messageRef = useRef(null);
+  const messageContainerRef = useRef(null);
   const textareaRef = useRef(null);
+
+  const fetchMessages = () => {
+    axios
+      .get(`/get-messages/${user.id}/${user.friendList[selectedFriend].id}`)
+      .then((response) => {
+        setMessages(response.data.messages);
+        messageContainerRef.current.scrollTo(
+          0,
+          messageContainerRef.current.scrollHeight
+        );
+      })
+      .catch((error) => console.log(error));
+  };
+
+  useEffect(() => {
+    supabase
+      .channel("messages")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+        },
+        fetchMessages
+      )
+      .subscribe();
+  }, []);
 
   useEffect(() => {
     if (!textareaRef.current) return;
@@ -23,10 +58,7 @@ export default function Chat() {
 
   useEffect(() => {
     if (selectedFriend !== null && user.friendList[selectedFriend].isFriend) {
-      axios
-        .get(`/get-messages/${user.id}/${user.friendList[selectedFriend].id}`)
-        .then((response) => setMessages(response.data.messages))
-        .catch((error) => console.log(error));
+      fetchMessages();
     }
   }, [selectedFriend]);
 
@@ -69,12 +101,15 @@ export default function Chat() {
       />
       <div
         ref={messageRef}
-        className="h-full pt-10 px-4 w-[calc(100%-240px)] flex flex-col justify-between"
+        className="h-full max-h-full pt-10 px-4 w-[calc(100%-240px)] flex flex-col justify-between"
       >
         {selectedFriend !== null ? (
           user.friendList[selectedFriend].isFriend ? (
             <>
-              <div className="flex flex-col gap-2 py-4">
+              <div
+                ref={messageContainerRef}
+                className="flex flex-col gap-2 py-4 overflow-y-auto"
+              >
                 {messages.map((message, index) => {
                   return (
                     <div

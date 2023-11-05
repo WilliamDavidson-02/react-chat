@@ -5,7 +5,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-const { CloudFog, LeafyGreen } = require("lucide-react");
 const app = express();
 
 const salt = bcrypt.genSaltSync(10);
@@ -302,7 +301,10 @@ app.get("/api/get-messages/:senderId/:recipientId", async (req, res) => {
     const { data } = await supabase
       .from("messages")
       .select("*")
-      .or(`sender_id.in.(${ids}), recipient_id.in.(${ids})`);
+      .in("sender_id", ids)
+      .in("recipient_id", ids);
+
+    console.log("data", data);
 
     res.status(200).json({ messages: data });
   } catch (error) {
